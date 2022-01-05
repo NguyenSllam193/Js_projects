@@ -14,14 +14,23 @@
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
+const player = $('.player')
+const cd = $('.cd')
 const playlist = $('.playlist')
+const heading = $('header h2')
+const cdThumb = $('.cd-thumb')
+const audio = $('#audio')
+const playBtn = $('.btn-toggle-play')
+
 
 const app = {
+    currentIndex: 0,
+
     songs: [
         {
             name: 'Nói Với Em Một Lời Trước Khi Xa Rời Remix',
             singer: 'Không Bằng (NA)',
-            path: 'https://soundcloud.com/ho-ng-ng-ph-ng-236057515/n-i-v-i-em-m-t-l-i-tr-c-khi-xa',
+            path: './assets/music/Nói Với Em Một Lời Trước Khi Xa Rời.mp3',
             image: 'https://i1.sndcdn.com/artworks-TxSkSt1FkBrnqqQR-8bf0Ig-t500x500.jpg'
         },
         {
@@ -33,7 +42,7 @@ const app = {
         {
             name: 'Nói Với Em Một Lời Trước Khi Xa Rời Remix',
             singer: 'Không Bằng (NA)',
-            path: 'https://soundcloud.com/ho-ng-ng-ph-ng-236057515/n-i-v-i-em-m-t-l-i-tr-c-khi-xa',
+            path: './assets/music/Nói Với Em Một Lời Trước Khi Xa Rời.mp3',
             image: 'https://i1.sndcdn.com/artworks-TxSkSt1FkBrnqqQR-8bf0Ig-t500x500.jpg'
         },
         {
@@ -45,7 +54,7 @@ const app = {
         {
             name: 'Nói Với Em Một Lời Trước Khi Xa Rời Remix',
             singer: 'Không Bằng (NA)',
-            path: 'https://soundcloud.com/ho-ng-ng-ph-ng-236057515/n-i-v-i-em-m-t-l-i-tr-c-khi-xa',
+            path: './assets/music/Nói Với Em Một Lời Trước Khi Xa Rời.mp3',
             image: 'https://i1.sndcdn.com/artworks-TxSkSt1FkBrnqqQR-8bf0Ig-t500x500.jpg'
         },
         {
@@ -57,7 +66,7 @@ const app = {
         {
             name: 'Nói Với Em Một Lời Trước Khi Xa Rời Remix',
             singer: 'Không Bằng (NA)',
-            path: 'https://soundcloud.com/ho-ng-ng-ph-ng-236057515/n-i-v-i-em-m-t-l-i-tr-c-khi-xa',
+            path: './assets/music/Nói Với Em Một Lời Trước Khi Xa Rời.mp3',
             image: 'https://i1.sndcdn.com/artworks-TxSkSt1FkBrnqqQR-8bf0Ig-t500x500.jpg'
         },
         {
@@ -69,7 +78,7 @@ const app = {
         {
             name: 'Nói Với Em Một Lời Trước Khi Xa Rời Remix',
             singer: 'Không Bằng (NA)',
-            path: 'https://soundcloud.com/ho-ng-ng-ph-ng-236057515/n-i-v-i-em-m-t-l-i-tr-c-khi-xa',
+            path: './assets/music/Nói Với Em Một Lời Trước Khi Xa Rời.mp3',
             image: 'https://i1.sndcdn.com/artworks-TxSkSt1FkBrnqqQR-8bf0Ig-t500x500.jpg'
         },
         {
@@ -100,23 +109,65 @@ const app = {
         playlist.innerHTML = htmls.join('')
     },
 
+    defineProperty: function(){
+        Object.defineProperty(this, 'currentSong', {
+            get: function(){
+                return this.songs[this.currentIndex]
+            }
+        })
+    },
+
     handleEvent: function(){
-        const cd = $('.cd')
+        const _this = this
         const cdWidth = cd.offsetWidth
 
+        // Xử lý phóng to, thu nhỏ đĩa nhạc
         document.onscroll = function(){
             const scrollTop = window.scrollY || document.documentElement.scrollTop
             const newCdWidth = cdWidth - scrollTop
-
-            console.log(newCdWidth)
             cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 0
             cd.style.opacity = newCdWidth / cdWidth
         }
+
+        // Xử lý khi click nút Play
+        playBtn.onclick = function(){
+            if(_this.isPlaying){
+                audio.pause()
+            }else{
+                audio.play()
+            }
+        }
+
+        // Khi play song
+        audio.onplay = function(){
+            _this.isPlaying = true
+            player.classList.add("playing")
+        }
+
+        // Khi pause song
+        audio.onpause = function(){
+            _this.isPlaying = false
+            player.classList.remove("playing")
+        }
+    },
+
+    loadCurrentSong: function(){
+        heading.textContent = this.currentSong.name
+        cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`
+        audio.src = this.currentSong.path
     },
 
     start: function(){
+        // Định nghĩa các thuộc tính cho object
+        this.defineProperty()
+
+        // Lắng nghe và xử lý các sự kiện (DOM EVENTS)
         this.handleEvent()
 
+        //  Tải thông tin đầu tiên khi ứng dụng được khởi chạy
+        this.loadCurrentSong()
+
+        // Render playlist
         this.render()
     }
 }
