@@ -31,7 +31,7 @@ const app = {
     {
         name: "Nói Với Em Một Lời Trước Khi Xa Rời Remix",
         singer: " Không Bằng (NA)",
-        path: "./music/Nói Với Em Một Lời Trước Khi Xa Rời.mp3",
+        path: "./assets/music/Nói Với Em Một Lời Trước Khi Xa Rời.mp3",
         image: "https://i1.sndcdn.com/artworks-TxSkSt1FkBrnqqQR-8bf0Ig-t500x500.jpg"
     },
     {
