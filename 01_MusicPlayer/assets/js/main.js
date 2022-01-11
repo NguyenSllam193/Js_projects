@@ -14,6 +14,8 @@
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
+const PLAY_STORAGE_KEY = 'Sollam'
+
 const player = $('.player')
 const cd = $('.cd')
 const playlist = $('.playlist')
@@ -32,6 +34,7 @@ const app = {
     isPlaying: false,
     isRandom: false,
     isRepeat: false,
+    // config: JSON.parse(localStorage.getItem(PLAY_STORAGE_KEY)) || {},
 
     songs: [
         {
@@ -96,10 +99,15 @@ const app = {
         }
     ],
 
+    setConfig: function(key, value){
+        this.config[key] = value
+        localStorage.setItem(PLAY_STORAGE_KEY, JSON.stringify(this.config))
+    },
+
     render: function(){
         const htmls = this.songs.map((song, index) => {
             return `
-                <div class="song ${index === this.currentIndex ? 'active' : ''}">
+                <div class="song ${index === this.currentIndex ? 'active' : ''}" data-index="${index}">
                     <div class="thumb"
                         style="background-image: url('${song.image}')">
                     </div>
@@ -136,7 +144,7 @@ const app = {
             cd.style.opacity = newCdWidth / cdWidth
         }
 
-        // Xử lý cd quay khi play song
+        // Xử lý cd quay khi play bài hát
         const cdThumbAnimate = cdThumb.animate([
             {   transform: "rotate(360deg)" }
         ], 
@@ -155,14 +163,14 @@ const app = {
             }
         }
 
-        // Khi play song
+        // Khi play bài hát
         audio.onplay = function(){
             _this.isPlaying = true
             player.classList.add("playing")
             cdThumbAnimate.play()
         }
 
-        // Khi pause song
+        // Khi pause bài hát
         audio.onpause = function(){
             _this.isPlaying = false
             player.classList.remove("playing")
@@ -207,12 +215,14 @@ const app = {
         // Chức năng random bài hát
         btnRandom.onclick = function(){
             _this.isRandom = !_this.isRandom
+            // _this.setConfig('isRandom', _this.isRandom)
             btnRandom.classList.toggle('active', _this.isRandom)
         }
 
         // Chức năng repate bài hát
         btnRepeat.onclick = function(){
             _this.isRepeat = !_this.isRepeat
+            // _this.setConfig('isRepeat', _this.isRepeat)
             btnRepeat.classList.toggle('active', _this.isRepeat)
         }
 
@@ -222,6 +232,25 @@ const app = {
                 audio.play()
             }else{
                 btnNext.click()
+            }
+        }
+
+        // Lắng nghe khi người dùng click vào playlist
+        playlist.onclick = function(e){
+            const songElement = e.target.closest('.song:not(.active)')
+            if(songElement || e.target.closest('.option')){
+                // Xử lý khi chọn bài hát bất kì
+                if(songElement){
+                    _this.currentIndex = Number(songElement.dataset.index)
+                    _this.loadCurrentSong()
+                    _this.render()
+                    audio.play()
+                }
+
+                // Xử lý khi ấn vào nút option bài hát
+                if(e.target.closest('.option')){
+                    console.log("Tạm thời chưa làm chức năng này")
+                }
             }
         }
     },
